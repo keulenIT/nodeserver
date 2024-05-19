@@ -2,6 +2,7 @@ const express = require("express");
 const hbs = require("hbs");
 const fs = require("fs");
 const port = process.env.PORT ? process.env.PORT : 3000;
+const maintenance = false;
 
 var app = express();
 
@@ -21,13 +22,16 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  res.render("maintenance.hbs");
+  if (maintenance) {
+    res.render("maintenance.hbs");
+  } else {
+    next();
+  }
 });
 
 app.use(express.static(__dirname + "/public"));
 
 hbs.registerHelper("getCurrentYear", () => {
-  //return 'test';
   return new Date().getFullYear();
 });
 
@@ -51,6 +55,12 @@ app.get("/about", (req, res) => {
 app.get("/bad", (req, res) => {
   res.send({
     errorMessage: "Unable to handle request",
+  });
+});
+
+app.get("/projects", (req, res) => {
+  res.render("projects.hbs", {
+    pageTitle: "Projects Page",
   });
 });
 
